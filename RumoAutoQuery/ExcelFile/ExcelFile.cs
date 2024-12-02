@@ -63,7 +63,7 @@ namespace RumoAutoQuery.Files
                 for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                 {
                     string value = worksheet.Cells[row, columnIndex].Text.Trim();
-                    if (string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value))
                     {
                         extractedValues.Add(value.ToString());
                     }

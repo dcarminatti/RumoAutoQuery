@@ -5,13 +5,13 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace RumoAutoQuery.Database
 {
     internal class DatabaseRepository
     {
-        private string connectionString = ConfigurationManager.ConnectionStrings["OracleDB"].ConnectionString;
-        public DatabaseRepository() { }
+        private string connectionString = ConfigurationManager.ConnectionStrings["PostgresDB"].ConnectionString;
 
         public List<string> ExistKeys(List<string> keys)
         {
@@ -23,16 +23,11 @@ namespace RumoAutoQuery.Database
                 {
                     connection.Open();
 
-                    string query = "SELECT CHAVE FROM TABELA WHERE CHAVE IN (:keys)";
+                    string stringKeys = string.Join(",", keys.Select(key => $"'{key}'"));
+                    string query = $"SELECT chave FROM chave_table WHERE CHAVE IN ({stringKeys})";
 
                     using (var command = new OracleCommand(query, connection))
                     {
-                        command.Parameters.Add(new OracleParameter("keys", string.Join(",", keys.Select((key, index) => $":key{index}"))));
-                        for (int i = 0; i < keys.Count; i++)
-                        {
-                            command.Parameters.Add(new OracleParameter($":key{i}", keys[i]));
-                        }
-
                         using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
